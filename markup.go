@@ -13,7 +13,7 @@ type EventListener struct {
 	Listener            func(*Event)
 	callPreventDefault  bool
 	callStopPropagation bool
-	wrapper             func(jsEvent js.Value)
+	wrapper             js.Callback //func(jsEvent []js.Value)
 }
 
 // PreventDefault prevents the default behavior of the event from occurring.

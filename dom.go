@@ -229,15 +229,18 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 	// Wrap event listeners
 	for _, l := range h.eventListeners {
 		l := l
-		l.wrapper = func(jsEvent js.Value) {
+		fun := func(jsEvent []js.Value) {
+			ev := jsEvent[0]
 			if l.callPreventDefault {
-				jsEvent.Call("preventDefault")
+				ev.Call("preventDefault")
 			}
 			if l.callStopPropagation {
-				jsEvent.Call("stopPropagation")
+				ev.Call("stopPropagation")
 			}
-			l.Listener(&Event{Value: jsEvent, Target: jsEvent.Get("target")})
+			l.Listener(&Event{Value: ev, Target: ev.Get("target")})
 		}
+		cb := js.NewCallback(fun)
+		l.wrapper = cb
 	}
 
 	// Properties
@@ -289,9 +292,10 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 	}
 
 	// Event listeners
-	//for _, l := range h.eventListeners {
-	//	h.node.Call("addEventListener", l.Name, l.wrapper)
-	//}
+	for _, l := range h.eventListeners {
+		//js.Global.Get("document").Call("getElementById", "myText").Call("addEventListener", "input", cb)
+		h.node.Call("addEventListener", l.Name, l.wrapper)
+	}
 
 	// InnerHTML
 	if h.innerHTML != prev.innerHTML {
