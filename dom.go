@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/hajimehoshi/gopherwasm/js"
+	"github.com/gowasm/gopherwasm/js"
 )
 
 // batch renderer singleton

@@ -1,12 +1,12 @@
 Changelog
 =========
 
-Although v1.0.0 [is not yet out](https://github.com/gopherjs/vecty/milestone/1), we do not expect many breaking changes. When there is one, however, it is documented clearly here.
+Although v1.0.0 [is not yet out](https://github.com/gowasm/vecty/milestone/1), we do not expect many breaking changes. When there is one, however, it is documented clearly here.
 
 Pre-v1.0.0 Breaking Changes
 ---------------------------
 
-## Nov 4, 2017 ([PR #158](https://github.com/gopherjs/vecty/pull/158)): major breaking change
+## Nov 4, 2017 ([PR #158](https://github.com/gowasm/vecty/pull/158)): major breaking change
 
 All `Component`s must now have a `Render` method which returns `vecty.ComponentOrHTML` instead of the prior `*vecty.HTML` type.
 
@@ -31,20 +31,20 @@ git grep -l ') Render() \*vecty.HTML' | xargs sed -i '' -e 's/) Render() \*vecty
 
 Obviously, you'll still need to verify that this only modifies your `Component` implementations. No other changes are needed, and no behavior change is expected for components that return `*vecty.HTML` (as the new `vecty.ComponentOrHTML` interface return type).
 
-## Oct 14, 2017 ([PR #155](https://github.com/gopherjs/vecty/pull/155)): major breaking change
+## Oct 14, 2017 ([PR #155](https://github.com/gowasm/vecty/pull/155)): major breaking change
 
 The function `prop.Class(string)` has been removed and replaced with `vecty.Class(...string)`.  Migrating users must use the new function and split their classes into separate strings, rather than a single space-separated string.
 
-## Oct 1, 2017 ([PR #147](https://github.com/gopherjs/vecty/pull/147)): minor breaking change
+## Oct 1, 2017 ([PR #147](https://github.com/gowasm/vecty/pull/147)): minor breaking change
 
 `MarkupOrChild` and `ComponentOrHTML` can both now contain `KeyedList` (a new type that has been added)
 
-## Sept 5, 2017 ([PR #140](https://github.com/gopherjs/vecty/pull/140)): minor breaking change
+## Sept 5, 2017 ([PR #140](https://github.com/gowasm/vecty/pull/140)): minor breaking change
 
-Package `storeutil` has been moved to `github.com/gopherjs/vecty/example/todomvc/store/storeutil` import path.
+Package `storeutil` has been moved to `github.com/gowasm/vecty/example/todomvc/store/storeutil` import path.
 
 
-## Sept 2, 2017 ([PR #134](https://github.com/gopherjs/vecty/pull/134)): major breaking change
+## Sept 2, 2017 ([PR #134](https://github.com/gowasm/vecty/pull/134)): major breaking change
 
 Several breaking changes have been made. Below, we describe how to upgrade your Vecty code to reflect each of these changes.
 
@@ -99,16 +99,16 @@ func (p *PageView) Render() *vecty.HTML {
 - The `Markup` _interface_ has been renamed to `Applyer`, and a `Markup` _function_ has been added to create a `MarkupList`.
 
 
-## Aug 6, 2017 ([PR #130](https://github.com/gopherjs/vecty/pull/130)): minor breaking change
+## Aug 6, 2017 ([PR #130](https://github.com/gowasm/vecty/pull/130)): minor breaking change
 
 The `Restorer` interface has been removed, component instances are now persistent. Properties should be denoted via ``` `vecty:"prop"` ``` struct field tags.
 
 
-## Jun 17, 2017 ([PR #117](https://github.com/gopherjs/vecty/pull/117)): minor breaking change
+## Jun 17, 2017 ([PR #117](https://github.com/gowasm/vecty/pull/117)): minor breaking change
 
 `(*HTML).Restore` is no longer exported, this method was not generally used externally.
 
 
-## May 11, 2017 ([PR #108](https://github.com/gopherjs/vecty/pull/108)): minor breaking change
+## May 11, 2017 ([PR #108](https://github.com/gowasm/vecty/pull/108)): minor breaking change
 
 `(*HTML).Node` is now a function instead of a struct field.

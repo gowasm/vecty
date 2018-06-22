@@ -4,7 +4,7 @@
 
 Vecty is a [React](https://facebook.github.io/react/)-like library for [GopherJS](https://github.com/gopherjs/gopherjs) so that you can do frontend development in Go instead of writing JavaScript/HTML/CSS.
 
-[![Build Status](https://travis-ci.org/gopherjs/vecty.svg?branch=master)](https://travis-ci.org/gopherjs/vecty) [![GoDoc](https://godoc.org/github.com/gopherjs/vecty?status.svg)](https://godoc.org/github.com/gopherjs/vecty) [![codecov](https://img.shields.io/codecov/c/github/gopherjs/vecty/master.svg)](https://codecov.io/gh/gopherjs/vecty)
+[![Build Status](https://travis-ci.org/gowasm/vecty.svg?branch=master)](https://travis-ci.org/gowasm/vecty) [![GoDoc](https://godoc.org/github.com/gowasm/vecty?status.svg)](https://godoc.org/github.com/gowasm/vecty) [![codecov](https://img.shields.io/codecov/c/github/gowasm/vecty/master.svg)](https://codecov.io/gh/gowasm/vecty)
 
 Features
 ========
@@ -33,7 +33,7 @@ Current Status
 
 -	APIs will change.
 -	The scope of Vecty is only ~80% defined currently.
--	There are a number of important [open issues](https://github.com/gopherjs/vecty/issues).
+-	There are a number of important [open issues](https://github.com/gowasm/vecty/issues).
 
 For a list of projects currently using Vecty, see the [doc/projects-using-vecty.md](doc/projects-using-vecty.md) file.
 

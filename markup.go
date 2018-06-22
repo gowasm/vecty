@@ -3,7 +3,7 @@ package vecty
 import (
 	"reflect"
 
-	"github.com/hajimehoshi/gopherwasm/js"
+	"github.com/gowasm/gopherwasm/js"
 )
 
 // EventListener is markup that specifies a callback function to be invoked when
