@@ -1,9 +1,10 @@
 package vecty
 
 import (
+	"fmt"
 	"reflect"
 
-	"github.com/gopherjs/gopherjs/js"
+	"github.com/hajimehoshi/gopherwasm/js"
 )
 
 // batch renderer singleton
@@ -150,7 +151,7 @@ type HTML struct {
 }
 
 // Node returns the underlying JavaScript Element or TextNode.
-func (h *HTML) Node() *js.Object { return h.node.(wrappedObject).j }
+func (h *HTML) Node() js.Value { return h.node.(wrappedObject).j }
 
 // Key implements the Keyer interface.
 func (h *HTML) Key() interface{} {
@@ -226,17 +227,31 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 	}
 
 	// Wrap event listeners
+	fmt.Println("Event Listener count:", len(h.eventListeners))
 	for _, l := range h.eventListeners {
+		// set the flags before the closure
 		l := l
-		l.wrapper = func(jsEvent *js.Object) {
+		var cbflags js.EventCallbackFlag
+		if l.callPreventDefault {
+			cbflags = cbflags + js.PreventDefault
+		}
+		if l.callStopPropagation {
+			cbflags = cbflags + js.StopPropagation
+		}
+		// wasm won't actually use the jsEvent.Call functions
+		fun := func(jsEvent js.Value) {
 			if l.callPreventDefault {
+				cbflags = cbflags + js.PreventDefault
 				jsEvent.Call("preventDefault")
 			}
 			if l.callStopPropagation {
+				cbflags = cbflags + js.StopPropagation
 				jsEvent.Call("stopPropagation")
 			}
-			l.Listener(&Event{Object: jsEvent, Target: jsEvent.Get("target")})
+			l.Listener(&Event{Value: jsEvent, Target: jsEvent.Get("target")})
 		}
+		cb := js.NewEventCallback(cbflags, fun)
+		l.wrapper = cb
 	}
 
 	// Properties
@@ -289,6 +304,7 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 
 	// Event listeners
 	for _, l := range h.eventListeners {
+		//js.Global.Get("document").Call("getElementById", "myText").Call("addEventListener", "input", cb)
 		h.node.Call("addEventListener", l.Name, l.wrapper)
 	}
 
@@ -833,7 +849,8 @@ func (b *batchRenderer) add(c Component) {
 
 // render the pending batch.
 // TODO(pdf): Add tests for time budget and multi-pass renders.
-func (b *batchRenderer) render(startTime float64) {
+func (b *batchRenderer) render(st []js.Value) {
+	startTime := st[0]
 	// If the batch is empty, mark as unscheduled, and stop render cycle.
 	if len(b.batch) == 0 {
 		b.scheduled = false
@@ -854,7 +871,7 @@ func (b *batchRenderer) render(startTime float64) {
 
 		// Check for remaining time budget, targeting 60fps (~16ms per frame).
 		if i > 0 {
-			elapsed := global.Get("performance").Call("now").Float() - startTime
+			elapsed := global.Get("performance").Call("now").Float() - startTime.Float()
 			budgetRemaining := (1000 / 60) - elapsed
 			avgRenderTime := elapsed / float64(i)
 			// If the budget remaining is less than 2 times the average
@@ -1139,8 +1156,13 @@ func unmount(e ComponentOrHTML) {
 }
 
 // requestAnimationFrame calls the native JS function of the same name.
-func requestAnimationFrame(callback func(float64)) int {
-	return global.Call("requestAnimationFrame", callback).Int()
+func requestAnimationFrame(callback func([]js.Value)) int {
+	fmt.Println("Global", global)
+	cb := js.NewCallback(callback)
+
+	//return global.Call("requestAnimationFrame", cb).Int()
+	global.Call("requestAnimationFrame", cb)
+	return 0
 }
 
 // RenderBody renders the given component as the document body. The given
@@ -1205,18 +1227,22 @@ type jsObject interface {
 	Float() float64
 }
 
-func wrapObject(j *js.Object) jsObject {
-	if j == nil {
+func wrapObject(j js.Value) jsObject {
+	if j == js.Null {
+		fmt.Println("Wrapping null")
 		return nil
 	}
 	if j == js.Undefined {
+
+		fmt.Println("Wrapping undefined")
 		return undefined
 	}
+	fmt.Println("Wrapping something real")
 	return wrappedObject{j}
 }
 
 type wrappedObject struct {
-	j *js.Object
+	j js.Value
 }
 
 func (w wrappedObject) Set(key string, value interface{}) {
@@ -1231,7 +1257,7 @@ func (w wrappedObject) Get(key string) jsObject {
 }
 
 func (w wrappedObject) Delete(key string) {
-	w.j.Delete(key)
+	w.j.Call("delete", key)
 }
 
 func (w wrappedObject) Call(name string, args ...interface{}) jsObject {
@@ -1240,6 +1266,8 @@ func (w wrappedObject) Call(name string, args ...interface{}) jsObject {
 			args[i] = v.j
 		}
 	}
+	fmt.Println("name:", name)
+	fmt.Println("args", args)
 	return wrapObject(w.j.Call(name, args...))
 }
 
