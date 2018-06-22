@@ -227,19 +227,30 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 	}
 
 	// Wrap event listeners
+	fmt.Println("Event Listener count:", len(h.eventListeners))
 	for _, l := range h.eventListeners {
+		// set the flags before the closure
 		l := l
-		fun := func(jsEvent []js.Value) {
-			ev := jsEvent[0]
+		var cbflags js.EventCallbackFlag
+		if l.callPreventDefault {
+			cbflags = cbflags + js.PreventDefault
+		}
+		if l.callStopPropagation {
+			cbflags = cbflags + js.StopPropagation
+		}
+		// wasm won't actually use the jsEvent.Call functions
+		fun := func(jsEvent js.Value) {
 			if l.callPreventDefault {
-				ev.Call("preventDefault")
+				cbflags = cbflags + js.PreventDefault
+				jsEvent.Call("preventDefault")
 			}
 			if l.callStopPropagation {
-				ev.Call("stopPropagation")
+				cbflags = cbflags + js.StopPropagation
+				jsEvent.Call("stopPropagation")
 			}
-			l.Listener(&Event{Value: ev, Target: ev.Get("target")})
+			l.Listener(&Event{Value: jsEvent, Target: jsEvent.Get("target")})
 		}
-		cb := js.NewCallback(fun)
+		cb := js.NewEventCallback(cbflags, fun)
 		l.wrapper = cb
 	}
 
