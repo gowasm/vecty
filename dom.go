@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/hajimehoshi/gopherwasm/js"
+	"github.com/gopherjs/gopherwasm/js"
 )
 
 // batch renderer singleton
@@ -1212,8 +1212,8 @@ func AddStylesheet(url string) {
 }
 
 var (
-	global    = wrapObject(js.Global)
-	undefined = wrappedObject{js.Undefined}
+	global    = wrapObject(js.Global())
+	undefined = wrappedObject{js.Undefined()}
 )
 
 type jsObject interface {
@@ -1228,11 +1228,11 @@ type jsObject interface {
 }
 
 func wrapObject(j js.Value) jsObject {
-	if j == js.Null {
+	if j == js.Null() {
 		fmt.Println("Wrapping null")
 		return nil
 	}
-	if j == js.Undefined {
+	if j == js.Undefined() {
 
 		fmt.Println("Wrapping undefined")
 		return undefined
