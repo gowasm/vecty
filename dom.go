@@ -1,7 +1,6 @@
 package vecty
 
 import (
-	"fmt"
 	"reflect"
 
 	"github.com/gopherjs/gopherwasm/js"
@@ -227,7 +226,6 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 	}
 
 	// Wrap event listeners
-	fmt.Println("Event Listener count:", len(h.eventListeners))
 	for _, l := range h.eventListeners {
 		// set the flags before the closure
 		l := l
@@ -1157,7 +1155,6 @@ func unmount(e ComponentOrHTML) {
 
 // requestAnimationFrame calls the native JS function of the same name.
 func requestAnimationFrame(callback func([]js.Value)) int {
-	fmt.Println("Global", global)
 	cb := js.NewCallback(callback)
 
 	//return global.Call("requestAnimationFrame", cb).Int()
@@ -1229,15 +1226,12 @@ type jsObject interface {
 
 func wrapObject(j js.Value) jsObject {
 	if j == js.Null() {
-		fmt.Println("Wrapping null")
 		return nil
 	}
 	if j == js.Undefined() {
 
-		fmt.Println("Wrapping undefined")
 		return undefined
 	}
-	fmt.Println("Wrapping something real")
 	return wrappedObject{j}
 }
 
@@ -1266,8 +1260,6 @@ func (w wrappedObject) Call(name string, args ...interface{}) jsObject {
 			args[i] = v.j
 		}
 	}
-	fmt.Println("name:", name)
-	fmt.Println("args", args)
 	return wrapObject(w.j.Call(name, args...))
 }
 
