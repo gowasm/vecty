@@ -13,6 +13,10 @@ const (
 	structTagOptionIncludeEmpty = "includeEmpty"
 )
 
+const valueFieldName = "Value"
+
+var jsValueType = reflect.TypeOf(js.Value{})
+
 // Value Returns the js value of a type
 func Value(p interface{}) js.Value {
 	t := reflect.TypeOf(p)
@@ -20,11 +24,17 @@ func Value(p interface{}) js.Value {
 
 	switch t.Kind() {
 	case reflect.Struct:
+		// If the struct has an embedded js.Value then we return that.
+		f, ok := t.FieldByName(valueFieldName)
+		if ok && f.Anonymous && f.Type == jsValueType {
+			return rv.FieldByName(valueFieldName).Interface().(js.Value)
+		}
+
 		v := js.Global().Get("Object").New()
 		structValue(v, p)
 		return v
 	case reflect.Ptr:
-		return Value(rv.Addr().Interface())
+		return Value(rv.Elem().Interface())
 	default:
 		return js.ValueOf(p)
 	}
