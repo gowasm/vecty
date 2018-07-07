@@ -56,6 +56,9 @@ func structValue(v js.Value, p interface{}) {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		fv := rv.Field(i)
+		if !fv.CanInterface() {
+			continue
+		}
 
 		fn := field.Name
 
