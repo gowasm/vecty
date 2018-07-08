@@ -3,9 +3,7 @@ package vecty
 import (
 	"reflect"
 
-
 	"github.com/gopherjs/gopherwasm/js"
-
 )
 
 // batch renderer singleton
