@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gopherjs/gopherjs/js"
+	"github.com/gopherjs/gopherwasm/js"
 )
 
 type testCore struct{ Core }
@@ -78,9 +78,9 @@ func TestCore(t *testing.T) {
 func TestHTML_Node(t *testing.T) {
 	// Create a non-nil *js.Object. For 'gopherjs test', &js.Object{} == nil
 	// because it is special-cased; but for 'go test' js.Global == nil.
-	x := js.Global // used for 'gopherjs test'
-	if x == nil {
-		x = &js.Object{} // used for 'go test'
+	x := js.Global() // used for 'gopherjs test'
+	if x == js.Null() {
+		x = js.Value{} // used for 'go test'
 	}
 	h := &HTML{node: wrapObject(x)}
 	if h.Node() != x {
@@ -316,7 +316,7 @@ func TestHTML_reconcile_std(t *testing.T) {
 		ts.record("(expected two added event listeners above)")
 		for i, m := range initEventListeners {
 			listener := m.(*EventListener)
-			if listener.wrapper == nil {
+			if listener.wrapper.Value == js.Null() {
 				t.Fatalf("listener %d wrapper == nil: %+v", i, listener)
 			}
 		}
@@ -329,7 +329,7 @@ func TestHTML_reconcile_std(t *testing.T) {
 		ts.record("(expected two removed, one added event listeners above)")
 		for i, m := range targetEventListeners {
 			listener := m.(*EventListener)
-			if listener.wrapper == nil {
+			if listener.wrapper.Value == js.Null() {
 				t.Fatalf("listener %d wrapper == nil: %+v", i, listener)
 			}
 		}
@@ -426,10 +426,10 @@ func TestHTML_reconcile_nil(t *testing.T) {
 		e1 := &EventListener{Name: "keydown"}
 		h := Tag("div", Markup(e0, e1))
 		h.reconcile(nil)
-		if e0.wrapper == nil {
+		if e0.wrapper.Value == js.Null() {
 			t.Fatal("e0.wrapper == nil")
 		}
-		if e1.wrapper == nil {
+		if e1.wrapper.Value == js.Null() {
 			t.Fatal("e1.wrapper == nil")
 		}
 	})
