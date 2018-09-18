@@ -17,8 +17,17 @@ const valueFieldName = "Value"
 
 var jsValueType = reflect.TypeOf(js.Value{})
 
+type JSValuer interface {
+	JSValue() js.Value
+}
+
 // Value Returns the js value of a type
 func Value(p interface{}) js.Value {
+	vr, ok := p.(JSValuer)
+	if ok {
+		return vr.JSValue()
+	}
+
 	t := reflect.TypeOf(p)
 	rv := reflect.ValueOf(p)
 
@@ -47,6 +56,9 @@ func structValue(v js.Value, p interface{}) {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		fv := rv.Field(i)
+		if !fv.CanInterface() {
+			continue
+		}
 
 		fn := field.Name
 
