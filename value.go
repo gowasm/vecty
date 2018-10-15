@@ -1,10 +1,12 @@
+// +build js,wasm
+
 package vecty
 
 import (
 	"reflect"
 	"strings"
 
-	"github.com/gopherjs/gopherwasm/js"
+	"syscall/js"
 )
 
 const (

@@ -1,3 +1,5 @@
+// +build js,wasm
+
 package prop
 
 import "github.com/gowasm/vecty"

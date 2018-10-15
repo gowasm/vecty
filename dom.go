@@ -1,9 +1,11 @@
+// +build js,wasm
+
 package vecty
 
 import (
+	"fmt"
 	"reflect"
-
-	"github.com/gopherjs/gopherwasm/js"
+	"syscall/js"
 )
 
 // batch renderer singleton
@@ -229,26 +231,15 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 	for _, l := range h.eventListeners {
 		// set the flags before the closure
 		l := l
-		var cbflags js.EventCallbackFlag
-		if l.callPreventDefault {
-			cbflags = cbflags + js.PreventDefault
-		}
-		if l.callStopPropagation {
-			cbflags = cbflags + js.StopPropagation
-		}
 		// wasm won't actually use the jsEvent.Call functions
-		fun := func(jsEvent js.Value) {
-			if l.callPreventDefault {
-				cbflags = cbflags + js.PreventDefault
-				jsEvent.Call("preventDefault")
-			}
-			if l.callStopPropagation {
-				cbflags = cbflags + js.StopPropagation
-				jsEvent.Call("stopPropagation")
-			}
-			l.Listener(&Event{Value: jsEvent, Target: jsEvent.Get("target")})
+		fun := func(this js.Value, args []js.Value) interface{} {
+			// TODO(BJK) figure out whether preventDefault still works
+			l.Listener(&Event{Value: args[0], Target: args[0].Get("target")})
+
+			// TODO(BJK) what should be returned here?
+			return nil
 		}
-		cb := js.NewEventCallback(cbflags, fun)
+		cb := js.NewCallback(fun)
 		l.wrapper = cb
 	}
 
@@ -847,12 +838,12 @@ func (b *batchRenderer) add(c Component) {
 
 // render the pending batch.
 // TODO(pdf): Add tests for time budget and multi-pass renders.
-func (b *batchRenderer) render(st []js.Value) {
+func (b *batchRenderer) render(this js.Value, st []js.Value) interface{} {
 	startTime := st[0]
 	// If the batch is empty, mark as unscheduled, and stop render cycle.
 	if len(b.batch) == 0 {
 		b.scheduled = false
-		return
+		return nil
 	}
 
 	// Drain the current batch.
@@ -896,6 +887,7 @@ func (b *batchRenderer) render(st []js.Value) {
 
 	// Schedule next frame.
 	requestAnimationFrame(b.render)
+	return nil
 }
 
 // extractHTML returns the *HTML from a ComponentOrHTML.
@@ -1154,7 +1146,7 @@ func unmount(e ComponentOrHTML) {
 }
 
 // requestAnimationFrame calls the native JS function of the same name.
-func requestAnimationFrame(callback func([]js.Value)) int {
+func requestAnimationFrame(callback func(this js.Value, args []js.Value) interface{}) int {
 	cb := js.NewCallback(callback)
 
 	//return global.Call("requestAnimationFrame", cb).Int()

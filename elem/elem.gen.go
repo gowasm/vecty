@@ -1,4 +1,7 @@
+// +build js,wasm
+
 //go:generate go run generate.go
+
 
 // Package elem defines markup to create DOM elements.
 //
