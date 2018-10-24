@@ -3,7 +3,6 @@
 package vecty
 
 import (
-	"fmt"
 	"reflect"
 	"syscall/js"
 )
