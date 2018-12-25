@@ -3,7 +3,7 @@
 package vecty
 
 import (
-	"fmt"
+//	"fmt"
 	"reflect"
 	"syscall/js"
 )
@@ -239,7 +239,7 @@ func (h *HTML) reconcileProperties(prev *HTML) {
 			// TODO(BJK) what should be returned here?
 			return nil
 		}
-		cb := js.NewCallback(fun)
+		cb := js.FuncOf(fun)
 		l.wrapper = cb
 	}
 
@@ -1147,7 +1147,7 @@ func unmount(e ComponentOrHTML) {
 
 // requestAnimationFrame calls the native JS function of the same name.
 func requestAnimationFrame(callback func(this js.Value, args []js.Value) interface{}) int {
-	cb := js.NewCallback(callback)
+	cb := js.FuncOf(callback)
 
 	//return global.Call("requestAnimationFrame", cb).Int()
 	global.Call("requestAnimationFrame", cb)
