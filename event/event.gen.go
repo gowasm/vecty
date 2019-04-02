@@ -1,3 +1,5 @@
+// +build js,wasm
+
 //go:generate go run generate.go
 
 // Package event defines markup to bind DOM events.

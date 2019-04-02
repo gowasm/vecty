@@ -1,3 +1,5 @@
+// +build js,wasm
+
 package vecty
 
 func replaceNode(newNode, oldNode jsObject) {
